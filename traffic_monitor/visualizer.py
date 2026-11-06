@@ -3,7 +3,7 @@ Visualizer and Heads-Up Display (HUD) renderer.
 Renders trajectories, bounding boxes, speed indicators, tripwire lines, and telemetry.
 """
 
-from typing import Dict, Tuple, Optional, Any
+from typing import Dict, Tuple, Optional, Any, List
 import cv2
 import numpy as np
 
