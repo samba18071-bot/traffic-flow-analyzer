@@ -1,0 +1,30 @@
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "traffic-flow-analyzer"
+version = "1.0.0"
+authors = [
+  { name="Samba", email="samba18071@gmail.com" },
+]
+description = "Real-time AI-powered vehicle detection, tracking, counting, and traffic flow monitoring."
+readme = "README.md"
+requires-python = ">=3.9"
+license = { text = "MIT" }
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+    "Topic :: Scientific/Engineering :: Image Recognition",
+]
+dependencies = [
+    "ultralytics>=8.0.0",
+    "opencv-python>=4.8.0",
+    "numpy>=1.23.0",
+    "pyyaml>=6.0",
+    "scipy>=1.10.0"
+]
+
+[project.scripts]
+traffic-analyzer = "traffic_monitor.main:main"
