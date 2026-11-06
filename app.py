@@ -476,3 +476,4 @@ else:
         with open(html_file, "r", encoding="utf-8") as f:
             html_code = f.read()
         components.html(html_code, height=650)
+
