@@ -41,6 +41,8 @@ venv.bak/
 *.mkv
 *.pt
 *.onnx
+*.part
+.*.part
 yolov8*.pt
 runs/
 output/
