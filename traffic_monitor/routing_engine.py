@@ -311,3 +311,4 @@ class DynamicRoutingEngine:
         self.bind_camera_to_segment("A", "B", camera_id="CAM_HWY_01")
         self.bind_camera_to_segment("B", "D", camera_id="CAM_HWY_02")
         self.bind_camera_to_segment("C", "E", camera_id="CAM_CST_01")
+

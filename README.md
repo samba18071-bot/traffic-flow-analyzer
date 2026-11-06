@@ -88,21 +88,22 @@ traffic-flow-analyzer/
 
 ## 🚀 Quick Start
 
-### 1. Clone & Set Up Environment
+### 1. Launch the Streamlit Web Application (GUI Mode)
+
+Run the modern Streamlit dashboard for recorded video analysis and live camera streams:
 
 ```bash
-git clone https://github.com/samba18071-bot/traffic-flow-analyzer.git
-cd traffic-flow-analyzer
-
-# Create virtual environment
-python3 -m venv venv
-source venv/bin/activate  # On Windows: venv\Scripts\activate
-
-# Install dependencies
-pip install -r requirements.txt
+streamlit run app.py
 ```
+Open **`http://localhost:8501`** in your browser to:
+- Select **Recorded Videos** (upload any MP4/AVI/MOV file or use the built-in corridor sample).
+- Switch to **Live Camera / Webcam** (device index 0, USB camera, or RTSP/IP camera URL).
+- Watch live YOLOv8 tracking, road width calipers, Level of Service (LOS) density, and real-time destination route guidance.
+- Explore the interactive road network map and download session analytics reports.
 
-### 2. Run Synthetic Demo (No Video File Needed!)
+---
+
+### 2. Run Synthetic Demo via CLI
 
 Run the built-in synthetic traffic demonstration:
 

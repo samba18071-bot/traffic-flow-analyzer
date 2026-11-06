@@ -75,3 +75,4 @@ def test_compare_routes_and_html_generation(tmp_path):
         content = f.read()
     assert "Traffic-Aware Dynamic Route Guidance" in content
     assert "svg" in content
+

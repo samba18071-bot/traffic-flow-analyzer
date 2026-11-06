@@ -402,3 +402,4 @@ class RouteMapGenerator:
         with open(output_filepath, "w", encoding="utf-8") as f:
             f.write(html_content)
         return output_filepath
+
