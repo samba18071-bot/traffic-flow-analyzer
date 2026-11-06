@@ -16,6 +16,7 @@ from traffic_monitor.counting import TrafficCounter
 from traffic_monitor.speed_estimator import SpeedEstimator
 from traffic_monitor.road_width_estimator import RoadWidthEstimator
 from traffic_monitor.traffic_analytics import TrafficAnalytics
+from traffic_monitor.routing_engine import DynamicRoutingEngine
 from traffic_monitor.visualizer import Visualizer
 
 
@@ -93,6 +94,11 @@ def run_pipeline(args):
     traffic_analytics = TrafficAnalytics(pixels_per_meter=args.ppm)
     visualizer = Visualizer()
 
+    routing_engine = None
+    route_info = None
+    if args.route_dest:
+        routing_engine = DynamicRoutingEngine()
+
     if args.road_left is not None and args.road_right is not None:
         road_estimator.set_horizontal_boundaries(args.road_left, args.road_right, line_y)
     elif is_demo:
@@ -159,6 +165,27 @@ def run_pipeline(args):
                 frame_width=width
             )
 
+            # Dynamic routing update
+            if routing_engine and args.route_dest and frame_idx % 15 == 0:
+                routing_engine.update_traffic_telemetry(
+                    u="A",
+                    v="B",
+                    vehicle_volume=counter.total_count,
+                    avg_speed_kmh=latest_los.get("avg_speed_kmh", 50.0),
+                    road_width_m=road_metrics.get("width_meters"),
+                    lanes=road_metrics.get("estimated_lanes"),
+                    los_grade=latest_los.get("los_grade"),
+                    has_hazard=len(alerts) > 0
+                )
+                r_calc = routing_engine.find_route("A", args.route_dest, strategy="fastest")
+                if r_calc:
+                    route_info = {
+                        "dest": args.route_dest,
+                        "eta": r_calc["total_time_min"],
+                        "dist": r_calc["total_distance_km"],
+                        "via": "➔".join(r_calc["path_nodes"])
+                    }
+
             # Render visuals
             annotated_frame = visualizer.draw_scene(
                 frame=frame,
@@ -171,7 +198,8 @@ def run_pipeline(args):
                 road_estimator=road_estimator,
                 road_metrics=road_metrics,
                 los_data=latest_los,
-                alerts=alerts
+                alerts=alerts,
+                route_info=route_info
             )
 
             if writer:
@@ -208,6 +236,14 @@ def run_pipeline(args):
         if latest_los:
             print(f"Final Level of Service: LOS {latest_los.get('los_grade')} ({latest_los.get('los_description')})")
             print(f"Corridor Occupancy: {latest_los.get('occupancy_pct')}% | Avg Corridor Speed: {latest_los.get('avg_speed_kmh')} km/h")
+        if routing_engine and args.route_dest:
+            final_r = routing_engine.find_route("A", args.route_dest, strategy="fastest")
+            if final_r:
+                print(f"\nOptimal Route to Destination [{args.route_dest}]:")
+                print(f"  • Path:       {' ➔ '.join(final_r['path_names'])}")
+                print(f"  • ETA:        {final_r['total_time_min']} mins")
+                print(f"  • Distance:   {final_r['total_distance_km']} km")
+                print(f"  • Est. Fuel:  {final_r['total_fuel_liters']} L")
         if traffic_analytics.incident_log:
             print(f"Safety Incidents Logged: {len(traffic_analytics.incident_log)}")
             for inc in traffic_analytics.incident_log[-5:]:
@@ -224,6 +260,7 @@ def main():
     parser.add_argument("--lane-width", type=float, default=3.5, help="Standard lane width in meters for lane count estimation")
     parser.add_argument("--road-left", type=int, default=None, help="Optional X pixel coordinate of left road boundary")
     parser.add_argument("--road-right", type=int, default=None, help="Optional X pixel coordinate of right road boundary")
+    parser.add_argument("--route-dest", type=str, default=None, help="Optional destination junction ID for real-time dynamic route guidance (e.g. F)")
     parser.add_argument("--max-disappeared", type=int, default=30, help="Frames allowed before track deregistration")
     parser.add_argument("--max-distance", type=float, default=80.0, help="Max distance px for track association")
     parser.add_argument("--max-frames", type=int, default=None, help="Stop after N frames (useful for testing/demo)")

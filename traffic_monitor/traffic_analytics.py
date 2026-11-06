@@ -189,3 +189,4 @@ class TrafficAnalytics:
                 if alert["frame_idx"] - logged["frame_idx"] < 60:
                     return
         self.incident_log.append(alert)
+

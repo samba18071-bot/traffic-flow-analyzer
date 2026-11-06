@@ -31,6 +31,14 @@ road_geometry:
   show_dimension_caliper: true
   caliper_color: [0, 165, 255] # BGR (Orange)
 
+routing:
+  enabled: true
+  default_strategy: "fastest"  # options: fastest, eco, smooth
+  bpr_alpha: 0.15
+  bpr_beta: 4.0
+  lane_capacity_vph: 1800.0
+  generate_dashboard_html: true
+
 display:
   show_bounding_boxes: true
   show_trajectories: true

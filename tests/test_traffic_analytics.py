@@ -94,3 +94,4 @@ def test_wrong_way_detection():
     assert len(alerts) == 1
     assert alerts[0]["type"] == "WRONG_WAY"
     assert alerts[0]["obj_id"] == 2
+

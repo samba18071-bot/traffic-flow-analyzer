@@ -25,7 +25,8 @@ class Visualizer:
         road_estimator: Optional[Any] = None,
         road_metrics: Optional[Dict[str, Any]] = None,
         los_data: Optional[Dict[str, Any]] = None,
-        alerts: Optional[List[Dict[str, Any]]] = None
+        alerts: Optional[List[Dict[str, Any]]] = None,
+        route_info: Optional[Dict[str, Any]] = None
     ) -> np.ndarray:
         output_frame = frame.copy()
         height, width = output_frame.shape[:2]
@@ -90,7 +91,7 @@ class Visualizer:
             self._render_alerts(output_frame, alerts, width)
 
         # Draw modern HUD overlay banner in top-left corner
-        self._render_hud(output_frame, inbound_count, outbound_count, counts_by_class, road_metrics, los_data)
+        self._render_hud(output_frame, inbound_count, outbound_count, counts_by_class, road_metrics, los_data, route_info)
 
         return output_frame
 
@@ -113,14 +114,17 @@ class Visualizer:
         outbound: int,
         counts_by_class: Dict[str, int],
         road_metrics: Optional[Dict[str, Any]] = None,
-        los_data: Optional[Dict[str, Any]] = None
+        los_data: Optional[Dict[str, Any]] = None,
+        route_info: Optional[Dict[str, Any]] = None
     ):
-        hud_w = 350
+        hud_w = 360
         hud_h = 135
         if road_metrics and road_metrics.get("width_meters", 0) > 0:
             hud_h += 24
         if los_data and los_data.get("los_grade"):
             hud_h += 26
+        if route_info and route_info.get("eta"):
+            hud_h += 24
 
         overlay = frame.copy()
         cv2.rectangle(overlay, (15, 15), (15 + hud_w, 15 + hud_h), (20, 20, 20), -1)
@@ -154,5 +158,14 @@ class Visualizer:
             color = los_data.get("los_color", (0, 255, 0))
             los_txt = f"LOS {grade} ({desc}) | Occ: {occ}%"
             cv2.putText(frame, los_txt, (25, curr_y), cv2.FONT_HERSHEY_SIMPLEX, 0.44, color, 1, cv2.LINE_AA)
+            curr_y += 24
+
+        if route_info and route_info.get("eta"):
+            dest = route_info.get("dest", "Destination")
+            eta = route_info.get("eta")
+            dist = route_info.get("dist")
+            path_str = route_info.get("via", "")
+            r_txt = f"Route➔{dest}: {eta}m ({dist}km) via {path_str}"
+            cv2.putText(frame, r_txt, (25, curr_y), cv2.FONT_HERSHEY_SIMPLEX, 0.42, (56, 189, 248), 1, cv2.LINE_AA)
 
 
