@@ -128,3 +128,4 @@ class CentroidTracker:
                 "trajectory": self.trajectories[obj_id]
             }
         return res
+

@@ -46,3 +46,4 @@ class SpeedEstimator:
 
         self.speeds[obj_id] = round(smoothed_speed, 1)
         return self.speeds[obj_id]
+

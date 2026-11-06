@@ -57,3 +57,4 @@ class VehicleDetector:
                     })
 
         return detections
+

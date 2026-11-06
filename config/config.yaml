@@ -23,9 +23,18 @@ speed_estimation:
   pixels_per_meter: 15.0     # Calibration factor: pixels per real-world meter
   fps: 30.0
 
+road_geometry:
+  enabled: true
+  pixels_per_meter: 15.0     # Spatial calibration ratio (pixels / meter)
+  standard_lane_width_m: 3.5 # Standard highway lane width in meters
+  auto_refine_with_vehicles: true
+  show_dimension_caliper: true
+  caliper_color: [0, 165, 255] # BGR (Orange)
+
 display:
   show_bounding_boxes: true
   show_trajectories: true
   show_hud: true
   line_color: [0, 255, 255]       # BGR (Yellow)
   box_color: [0, 255, 0]          # BGR (Green)
+

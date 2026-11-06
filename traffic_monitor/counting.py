@@ -53,3 +53,4 @@ class TrafficCounter:
     @property
     def total_count(self) -> int:
         return self.inbound_count + self.outbound_count
+

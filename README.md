@@ -15,6 +15,9 @@
 - **📍 Trajectory Tracking**: Robust centroid-based object tracking with persistent ID management and anti-flicker filtering.
 - **⚡ Bidirectional Tripwire Counting**: High-precision virtual counting lines differentiating inbound and outbound vehicular traffic flows.
 - **🏎️ Speed Estimation**: Calibrated displacement-over-time velocity measurement in km/h.
+- **🛣️ Road Width & Geometry Estimation**: Real-time road carriageway width measurement in meters and feet, lane capacity estimation, and engineering caliper overlay.
+- **📊 Level of Service (LOS) & Occupancy**: Real-time highway congestion density analysis (LOS A to F per HCM standards) and corridor occupancy percentage.
+- **🚨 Safety Anomaly Detection**: Automatic detection and alerting for Wrong-Way Driving and Stalled/Stopped Vehicles.
 - **🖥️ Dynamic HUD & Overlay**: Real-time traffic statistics, per-class counts, bounding boxes, trajectories, and directional indicators.
 - **🎮 Built-In Demo Mode**: Includes an offline synthetic video generator for immediate out-of-the-box testing without external dependencies or media files.
 
@@ -29,7 +32,8 @@
                                                                   |
                                                                   v
 +--------------------+      +--------------------+      +--------------------+
-| Display / MP4 File | <--- |   HUD Visualizer   | <--- | Counter & Velocity |
+| Display / MP4 File | <--- |   HUD Visualizer   | <--- | Counter, Velocity  |
+|                    |      |  (Calipers & HUD)  |      |   & Road Width     |
 +--------------------+      +--------------------+      +--------------------+
 ```
 
@@ -47,12 +51,14 @@ traffic-flow-analyzer/
 │   ├── tracker.py           # Multi-object centroid tracker
 │   ├── counting.py          # Bidirectional tripwire counting logic
 │   ├── speed_estimator.py   # Pixel-to-metric velocity estimation
-│   ├── visualizer.py        # Heads-up display (HUD) and bounding box renderer
+│   ├── road_width_estimator.py # Road width and lane capacity estimation
+│   ├── visualizer.py        # Heads-up display (HUD) and caliper renderer
 │   └── main.py              # Application entry point & stream pipeline
 ├── tests/
 │   ├── __init__.py
 │   ├── test_tracker.py      # Unit tests for object tracking
-│   └── test_counting.py     # Unit tests for tripwire logic
+│   ├── test_counting.py     # Unit tests for tripwire logic
+│   └── test_road_width.py   # Unit tests for road width estimator
 ├── .gitignore
 ├── LICENSE                  # MIT License
 ├── pyproject.toml           # Modern package configuration
@@ -112,7 +118,21 @@ Modify `config/config.yaml` or use CLI flags:
 | `--conf` | `0.4` | YOLO detection confidence threshold |
 | `--line-ratio` | `0.6` | Vertical position of the counting line (0.0 to 1.0) |
 | `--ppm` | `15.0` | Calibration factor (pixels per real-world meter) |
+| `--lane-width` | `3.5` | Standard lane width in meters for lane count estimation |
+| `--road-left` | `None` | Optional X pixel coordinate of left road boundary |
+| `--road-right` | `None` | Optional X pixel coordinate of right road boundary |
 | `--no-display` | `false` | Run in headless mode without GUI window |
+
+---
+
+## 🛣️ Road Width & Geometry Estimation
+
+The road width estimation module measures carriageway dimensions and layout in real time:
+1. **Calibration**: Converts pixel distance to metric dimensions via spatial scale ratio ($\text{ppm} = \text{pixels per meter}$).
+2. **Lane Estimation**: Computes estimated lane count:
+   $$\text{Estimated Lanes} = \max\left(1, \operatorname{round}\left(\frac{\text{Width (m)}}{\text{Standard Lane Width (m)}}\right)\right)$$
+3. **Automated Tracking & Refinement**: Dynamic vehicle envelope tracking refines road bounds based on observed vehicular pathways plus safety shoulder margins.
+4. **Engineering Caliper Overlay**: Displays an on-screen dimension line with end-caps, measurement badge, and dual-unit metric/imperial metrics (meters & feet).
 
 ---
 
@@ -129,3 +149,4 @@ python3 -m unittest discover tests
 ## 📄 License
 
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+
